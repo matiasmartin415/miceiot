@@ -124,7 +124,7 @@ app.post('/measurement', async function (req, res) {
 */
 // Registrar dispositivo manualmente por API (CON DIAGNÓSTICO)
 // Registrar dispositivo manualmente por API (PROTEGIDA CON TOKEN - LIMPIA)
-/*app.post('/device', function (req, res) {
+app.post('/device', function (req, res) {
     const ADMIN_TOKEN_SECRETO = "clavemaestra123";
 
     // Capturamos el token que viene desde las cabeceras de la petición
@@ -141,44 +141,6 @@ app.post('/measurement', async function (req, res) {
     db.public.none("INSERT INTO devices VALUES ('"+req.body.id+ "', '"+req.body.n+"', '"+req.body.k+"')");
 	res.send("received new device");
 });
-*/
-
-// Registrar dispositivo de forma segura (EVITA DUPLICADOS Y PROTEGE CON TOKEN)
-app.post('/device', function (req, res) {
-    const ADMIN_TOKEN_SECRETO = "clavemaestra123";
-    const tokenRecibido = req.headers['x-admin-token'];
-
-    // 1. Validación de seguridad del Administrador
-    if (!tokenRecibido || tokenRecibido !== ADMIN_TOKEN_SECRETO) {
-        console.log("⚠️ ALERTA: Intento de registro RECHAZADO por Token inválido o ausente.");
-        return res.status(401).send("No autorizado: Se requiere el Token de Administrador.");
-    }
-
-    const devId = req.body.id;
-    const devName = req.body.n;
-    const devKey = req.body.k;
-
-    if (!devId) {
-        return res.status(400).send("Falta el ID del dispositivo.");
-    }
-
-    // 2. Controlar que no se duplique el ID en la tabla SQL
-    try {
-        const existe = db.public.manyOrNone("SELECT * FROM devices WHERE device_id = '" + devId + "'");
-        if (existe && existe.length > 0) {
-            console.log("⚠️ ALERTA: Intento de registrar ID duplicado bloqueado: " + devId);
-            return res.status(409).send("Error: El dispositivo con ID '" + devId + "' ya se encuentra registrado.");
-        }
-    } catch (err) {
-        // Si pg-mem da error en el SELECT por estar vacío el registro, continuamos sin problemas
-    }
-
-    // 3. Si no está duplicado, se realiza la inserción limpia
-	console.log("🔒 [ADMIN] Registrando -> ID: " + devId + " | Name: " + devName + " | Key: " + devKey);
-    db.public.none("INSERT INTO devices VALUES ('" + devId + "', '" + devName + "', '" + devKey + "')");
-	res.send("received new device");
-});
-
 
 /*app.post('/device', function (req, res) {
     const ADMIN_TOKEN_SECRETO = "clavemaestra123";
@@ -275,11 +237,7 @@ startDatabase().then(async() => {
     console.log("mongo measurement database Up");
 
     // Creación de tablas y datos iniciales en la BD SQL simulada
-    //db.public.none("CREATE TABLE devices (device_id VARCHAR, name VARCHAR, key VARCHAR)");
-
-    // 🚀 REEMPLÁZALA POR ESTA (Añadimos PRIMARY KEY al ID):
-    db.public.none("CREATE TABLE devices (device_id VARCHAR PRIMARY KEY, name VARCHAR, key VARCHAR)");
-    
+    db.public.none("CREATE TABLE devices (device_id VARCHAR, name VARCHAR, key VARCHAR)");
     db.public.none("INSERT INTO devices VALUES ('00', 'Fake Device 00', '123456')");
     db.public.none("INSERT INTO devices VALUES ('01', 'Fake Device 01', '234567')");
     db.public.none("CREATE TABLE users (user_id VARCHAR, name VARCHAR, key VARCHAR)");

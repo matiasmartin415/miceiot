@@ -20,12 +20,12 @@
 #endif
 
 
-#define WIFI_SSID       ""
-#define WIFI_PASSWORD   ""
+#define WIFI_SSID       "Redmi Note 7"
+#define WIFI_PASSWORD   "8365c4b9ca01"
 
-#define SERVER_URL      "http://192.168.1.101:8080/measurement"
+#define SERVER_URL      "http://192.168.1.102:8080/measurement"
 
-#define DEVICE_ID "01"
+#define DEVICE_ID "07"
 
 #define WIFI_CONNECTED_BIT BIT0
 

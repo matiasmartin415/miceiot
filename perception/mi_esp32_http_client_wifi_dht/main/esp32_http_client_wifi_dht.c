@@ -11,16 +11,30 @@
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 
+#include <dht.h>
+
 #include "esp_http_client.h"
+
+#ifndef APP_CPU_NUM
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 
 #define WIFI_SSID       "Redmi Note 7"
 #define WIFI_PASSWORD   "8365c4b9ca01"
 
-#define SERVER_URL      "http://192.168.1.102:8080/measurement"
+#define SERVER_URL      "http://192.168.43.42:8080/measurement"
 
-#define DEVICE_ID "01"
+#define DEVICE_ID "07"
+#define DEVICE_KEY "8888"//acá definí clave
 
 #define WIFI_CONNECTED_BIT BIT0
+
+#define SENSOR_TYPE DHT_TYPE_DHT11
+
+#define INTERNAL_PULLUP 0
+#define DATA_GPIO 14 //para ESP32-cam en pin IO14 entrada datos DHT
+
 
 static const char *TAG = "HTTP_TEST";
 static EventGroupHandle_t wifi_event_group;
@@ -189,18 +203,13 @@ static void http_get(void)
  * --------------------------------------------------------- */
 
 
-static char *POST_DATA_TEMPLATE = "id="DEVICE_ID"&t=%0.2f&h=%0.2f";
+static char *POST_DATA_TEMPLATE = "id="DEVICE_ID"&key="DEVICE_KEY"&t=%0.2f&h=%0.2f";//acá agregué "&key="DEVICE_KEY"
 
-static void http_post(void)
-{
-
-    float pressure, temperature, humidity;
-    temperature = 12.1;
-    humidity = 73.3;
+static void http_post(float *pressure, float *temperature, float *humidity) {
 
     char post_data[64];
 
-    sprintf(post_data,POST_DATA_TEMPLATE, temperature, humidity);
+    sprintf(post_data,POST_DATA_TEMPLATE, *temperature, *humidity);
 
     ESP_LOGI(TAG, "POST %s", SERVER_URL);
     ESP_LOGI(TAG, "POST_DATA %s", post_data);
@@ -274,9 +283,14 @@ void app_main(void)
 
     vTaskDelay(pdMS_TO_TICKS(1000));
 
-//    http_get();
-
-    vTaskDelay(pdMS_TO_TICKS(2000));
-
-    http_post();
+    float pressure, temperature, humidity;
+    while (1) { 
+       if (dht_read_float_data(SENSOR_TYPE, DATA_GPIO, &humidity, &temperature) == ESP_OK) {
+            printf("Humidity: %.1f%% Temp: %.1fC\n", humidity, temperature);
+            http_post(&pressure, &temperature, &humidity);
+       } else {
+            printf("Could not read data from sensor\n");
+        }
+       vTaskDelay(pdMS_TO_TICKS(5000));
+    }
 }
