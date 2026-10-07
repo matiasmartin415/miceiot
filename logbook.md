@@ -5,17 +5,18 @@ Este archivo sirve como registro de configuración, pruebas de seguridad y notas
 ---
 
 ## 🛠️ Arquitectura del Sistema
-- **Dispositivos:** ESP32 (C nativo / ESP-IDF) y Notebook Ubuntu (Simulador Python en carpeta `tools/`).
+- **Dispositivos:** ESP32 (C nativo / ESP-IDF) y Notebook Ubuntu (Simulador Python en carpeta `tools/`). ESP32-cam 
 - **API (Backend):** Node.js con Express (`index.js`).
 - **Bases de Datos:** 
   - **MongoDB (Docker - Puerto 27018):** Almacenamiento histórico de mediciones (`measurements`).
   - **pg-mem (SQL en memoria):** Control de acceso y listado público de dispositivos (`devices`).
   
-  Conecto todo a AP Redmi note 7
+  - **Conecto todo a  AP Redmi note 7
+  - **Para presentar a router
 
 ---
-# Bitacora
-- ###22/09/2026
+# Bitacora actualizada
+###22/09/2026
 //Luego de muchos errores logro compilar y flash a Esp32 (Monitoreo con monitor serial arduino entrada y salida de ES).
 Timestamp.
 Modifico index.js para generar timestamp. Aparece marca en pestaña "measurement" pero desaparece dispositivo del resto de pestañas.
@@ -60,6 +61,8 @@ Could not read data from sensor"
 
 Es lógico, falta conectar sensor dht a algun pin.
 Ahora defino pin 14 como entrada datos DHT. Flash, ahora si mide.
+
+A partir de acá lo generó IA con ejemplo que le pedí.
 
 ## 🔒 Registro de Validaciones y Escudos de Seguridad
 
