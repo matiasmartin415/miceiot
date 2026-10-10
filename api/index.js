@@ -179,6 +179,58 @@ app.post('/device', function (req, res) {
 	res.send("received new device");
 });
 
+// ==========================================================
+// 🗑️ RUTA DE ADMINISTRACIÓN: ELIMINAR DISPOSITIVO (CON TOKEN)
+// ==========================================================
+// ==========================================================
+// 🗑️ RUTA DE ELIMINACIÓN DE DISPOSITIVO (CORREGIDA AL 100%)
+// ==========================================================
+app.delete('/device/:id', function (req, res) {
+    const ADMIN_TOKEN_SECRETO = "clavemaestra123";
+    const tokenRecibido = req.headers['x-admin-token'];
+
+    // 1. Validación de seguridad del Administrador
+    if (!tokenRecibido || tokenRecibido !== ADMIN_TOKEN_SECRETO) {
+        console.log("⚠️ ALERTA: Intento de ELIMINACIÓN RECHAZADO por Token inválido o ausente.");
+        return res.status(401).send("No autorizado: Se requiere el Token de Administrador.");
+    }
+
+    const devId = req.params.id;
+
+    if (!devId) {
+        return res.status(400).send("Falta especificar el ID del dispositivo a eliminar.");
+    }
+
+    // 2. CORRECCIÓN: Usamos un bloque try/catch con tu función .many() nativa para verificar existencia
+    let existe = false;
+    try {
+        const resultado = db.public.many("SELECT * FROM devices WHERE device_id = '" + devId + "'");
+        if (resultado && resultado.length > 0) {
+            existe = true;
+        }
+    } catch (err) {
+        // Si da error es porque SELECT devolvió 0 filas (comportamiento estándar de pg-mem con .many)
+        existe = false;
+    }
+
+    // 3. Si el dispositivo no se encontró, devolvemos el error 404 seguro
+    if (!existe) {
+        console.log("⚠️ ALERTA: Intento de eliminar un ID inexistente: " + devId);
+        return res.status(404).send("Error: El dispositivo con ID '" + devId + "' no existe en el sistema.");
+    }
+
+    // 4. Si existe, procedemos a borrarlo usando .none() como en el resto de tu código
+    try {
+        db.public.none("DELETE FROM devices WHERE device_id = '" + devId + "'");
+        console.log("🗑️ [ADMIN] Dispositivo ELIMINADO del sistema -> ID: " + devId);
+        
+        res.send("Dispositivo " + devId + " eliminado con éxito del control de acceso.");
+    } catch (error) {
+        console.error("Error crítico al ejecutar el DELETE en SQL:", error);
+        res.status(500).send("Error interno al procesar la baja.");
+    }
+});
+
 
 /*app.post('/device', function (req, res) {
     const ADMIN_TOKEN_SECRETO = "clavemaestra123";
