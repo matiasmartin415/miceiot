@@ -62,6 +62,9 @@ Could not read data from sensor"
 Es lógico, falta conectar sensor dht a algun pin.
 Ahora defino pin 14 como entrada datos DHT. Flash, ahora si mide.
 
+###08/10/2026
+//Modifiqué index para permitir borrado de dispositivos. Pruebo con Postman, ok (con uso de clavemaestra)
+
 A partir de acá lo generó IA con ejemplo que le pedí.
 
 ## 🔒 Registro de Validaciones y Escudos de Seguridad
