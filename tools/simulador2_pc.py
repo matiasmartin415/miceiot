@@ -6,8 +6,8 @@ import psutil
 URL_API = "http://localhost:8080/measurement"
 
 # 🔐 DATOS AUTORIZADOS EN TU BASE DE DATOS SQL
-DEVICE_ID = "09"
-DEVICE_KEY = "9999"
+DEVICE_ID = "05"
+DEVICE_KEY = "5555"
 
 def obtener_temperatura_cpu():
     try:
