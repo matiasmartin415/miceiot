@@ -19,11 +19,13 @@
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
+//#define WIFI_SSID       ""
+//#define WIFI_PASSWORD   ""
+#define WIFI_SSID       "xxxxxxxxxxx"
+#define WIFI_PASSWORD   "xxxxxxxxxxx"
 
-#define WIFI_SSID       "Redmi Note 7"
-#define WIFI_PASSWORD   "8365c4b9ca01"
 
-#define SERVER_URL      "http://192.168.43.42:8080/measurement"
+#define SERVER_URL      "http://192.168.1.63:8080/measurement"
 
 #define DEVICE_ID "07"
 #define DEVICE_KEY "8888"//acá definí clave
@@ -33,8 +35,8 @@
 #define SENSOR_TYPE DHT_TYPE_DHT11
 
 #define INTERNAL_PULLUP 0
-#define DATA_GPIO 14 //para ESP32-cam en pin IO14 entrada datos DHT
-
+#define DATA_GPIO 17 //para ESP32-cam en pin IO14 entrada datos DHT
+                    //17 para ESPWROOM32
 
 static const char *TAG = "HTTP_TEST";
 static EventGroupHandle_t wifi_event_group;
