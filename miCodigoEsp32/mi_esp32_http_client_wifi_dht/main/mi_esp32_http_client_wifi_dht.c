@@ -35,7 +35,7 @@
 #define SENSOR_TYPE DHT_TYPE_DHT11
 
 #define INTERNAL_PULLUP 0
-#define DATA_GPIO 17 //para ESP32-cam en pin IO14 entrada datos DHT
+#define DATA_GPIO 17 //14 para ESP32-cam en pin IO14 entrada datos DHT
                     //17 para ESPWROOM32
 
 static const char *TAG = "HTTP_TEST";
