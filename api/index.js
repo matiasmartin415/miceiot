@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const { MongoClient } = require("mongodb");
+const {MongoClient} = require("mongodb");
 const PgMem = require("pg-mem");
 
 const db = PgMem.newDb();
@@ -46,6 +46,7 @@ const PORT = 8080;
 // Ruta para recibir mediciones del ESP32 y Python (CORREGIDA)
 // Ahora modifico
 // Ruta para recibir mediciones con VALIDACIÓN ESTRICTA DE SEGURIDAD
+// Timestamp, verifica dispositivo esta en la lista y verifica key, si no, rechaza medicion.
 app.post('/measurement', async function (req, res) {
     const fechaActual = new Date();
     const timestampLog = fechaActual.toLocaleString('es-AR', { timeZone: 'America/Buenos_Aires' });
@@ -57,7 +58,7 @@ app.post('/measurement', async function (req, res) {
 
     if (!devId) {
         return res.status(400).send("Falta el ID del dispositivo");
-    }
+        }
 
     console.log("[" + timestampLog + "] Intento de envío -> ID: " + devId + " | Key recibida: " + devKey);	
     
@@ -144,6 +145,8 @@ app.post('/measurement', async function (req, res) {
 */
 
 // Registrar dispositivo de forma segura (EVITA DUPLICADOS Y PROTEGE CON TOKEN)
+//Para registrar pide clave para administrar, pide Id dispositivo (no estoy seguro nombre y key son obligatorios)
+//Agregué if para q tambien pida nombre y key dispositivo 
 app.post('/device', function (req, res) {
     const ADMIN_TOKEN_SECRETO = "clavemaestra123";
     const tokenRecibido = req.headers['x-admin-token'];
@@ -161,9 +164,15 @@ app.post('/device', function (req, res) {
     if (!devId) {
         return res.status(400).send("Falta el ID del dispositivo.");
     }
+    if (!devName || !devKey) {
+       return res.status(400).send("Falta el nombre o la clave del dispositivo.");
+    }
 
     // 2. Controlar que no se duplique el ID en la tabla SQL
+    //Controla antes de insertar si ID ya existe (primera defensa contra duplicados)
     try {
+        //Acá también hay problema por inyeccion datos SQL (comilla simple y +)
+        //Hay que parametrizar a pesar del Token de mas arriba (el token proteje quien entra y la parametriz. que entra)
         const existe = db.public.manyOrNone("SELECT * FROM devices WHERE device_id = '" + devId + "'");
         if (existe && existe.length > 0) {
             console.log("⚠️ ALERTA: Intento de registrar ID duplicado bloqueado: " + devId);
@@ -231,7 +240,6 @@ app.delete('/device/:id', function (req, res) {
     }
 });
 
-
 /*app.post('/device', function (req, res) {
     const ADMIN_TOKEN_SECRETO = "clavemaestra123";
 
@@ -252,8 +260,6 @@ app.delete('/device/:id', function (req, res) {
 	res.send("received new device");
 });
 */
-
-
 
 // Listar dispositivos en HTML (Regresa a tu sintaxis original exacta)
 app.get('/web/device', function (req, res) {
@@ -329,18 +335,20 @@ startDatabase().then(async() => {
     // Creación de tablas y datos iniciales en la BD SQL simulada
     //db.public.none("CREATE TABLE devices (device_id VARCHAR, name VARCHAR, key VARCHAR)");
 
-    // 🚀 REEMPLÁZALA POR ESTA (Añadimos PRIMARY KEY al ID):
+    // REEMPLÁZALA POR ESTA (Añadimos PRIMARY KEY al ID):
+    // Protege contra duplicados que pasen la comprobación de más arriba (Ej. 2 esp32 que se registran al mismo tiempo)
     db.public.none("CREATE TABLE devices (device_id VARCHAR PRIMARY KEY, name VARCHAR, key VARCHAR)");
-    
+    //(Para no repetir el mismo ID, lo cual es un error de diseño que permite duplicados)
+
+    //Funciona pero está mal, explicado por profesor (permite ataque de inyección SQL)
+    //Aca agrego dispositivos que voy a permitir
     db.public.none("INSERT INTO devices VALUES ('00', 'Fake Device 00', '123456')");
     db.public.none("INSERT INTO devices VALUES ('01', 'Fake Device 01', '234567')");
     db.public.none("CREATE TABLE users (user_id VARCHAR, name VARCHAR, key VARCHAR)");
     db.public.none("INSERT INTO users VALUES ('1','Ana','admin123')");
     db.public.none("INSERT INTO users VALUES ('2','Beto','user123')");
     
-    //Aca agrego dispositivos que voy a permitir
     db.public.none("INSERT INTO devices VALUES ('07', 'Sensor_Oficina (ESP32)', '8888')");
-    //db.public.none("INSERT INTO devices VALUES ('09', '09', '9999')");
     db.public.none("INSERT INTO devices VALUES ('09', 'Mi_Notebook', '9999')");
 
     //////////
