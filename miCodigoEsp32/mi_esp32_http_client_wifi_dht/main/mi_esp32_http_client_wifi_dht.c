@@ -21,14 +21,14 @@
 
 //#define WIFI_SSID       ""
 //#define WIFI_PASSWORD   ""
-#define WIFI_SSID       "xxxxxxxxxxx"
-#define WIFI_PASSWORD   "xxxxxxxxxxx"
+#define WIFI_SSID       "xxxxxx"
+#define WIFI_PASSWORD   "xxxxxx"
 
 
 #define SERVER_URL      "http://192.168.1.63:8080/measurement"
 
-#define DEVICE_ID "07"
-#define DEVICE_KEY "8888"//acá definí clave
+#define DEVICE_ID "xx"
+#define DEVICE_KEY "xxxx"//acá definí clave
 
 #define WIFI_CONNECTED_BIT BIT0
 
