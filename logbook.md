@@ -65,6 +65,11 @@ Ahora defino pin 14 como entrada datos DHT. Flash, ahora si mide.
 ###08/10/2026
 //Modifiqué index para permitir borrado de dispositivos. Pruebo con Postman, ok (con uso de clavemaestra)
 
+###17/10/2026
+//Ayer presenté por Meet mi TP 4 dispositivos enviando mediciones a la API.Con 2 Esp32 (uno es el cam) y con 2 script en Python simulando ser esp32.
+Desde Postman dí de alta Esp32 cam que estaba reportando. La API lo procesaba pero no admitía las mediciones del esp-cam por no estar el dispositivo registrado. Doy de alta dispositivo desde Postman y ahora si, la API acepta mediciones y las guarda en Mongo. 
+También probé hacer posteos de mediciones desde Postman, ok. 
+
 A partir de acá lo generó IA con ejemplo que le pedí.
 
 ## 🔒 Registro de Validaciones y Escudos de Seguridad
